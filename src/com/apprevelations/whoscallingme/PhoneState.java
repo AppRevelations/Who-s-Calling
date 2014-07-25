@@ -1,9 +1,12 @@
 package com.apprevelations.whoscallingme;
 
+import java.util.Locale;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -12,11 +15,23 @@ import android.widget.Toast;
 public class PhoneState extends Service {
 	private CallStateListener mCallStateListener = new CallStateListener();
 	private TelephonyManager mTelephonyManager;
+	private TextToSpeech tts;
 	private int mCallState;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		tts=new TextToSpeech(getApplicationContext(), 
+			      new TextToSpeech.OnInitListener() {
+		      @Override
+		      public void onInit(int status) {
+		         if(status != TextToSpeech.ERROR){
+		             tts.setLanguage(Locale.UK);
+		             tts.setPitch((float) 3.0);
+		             tts.setSpeechRate((float) 0.4);
+		            }				
+		         }
+		      });
 		mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 		mCallState = mTelephonyManager.getCallState();
 		mTelephonyManager.listen(mCallStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -26,6 +41,10 @@ public class PhoneState extends Service {
 	public void onDestroy() {
 		Log.d("onDestroy", "onDestroy");
 		mTelephonyManager.listen(mCallStateListener, PhoneStateListener.LISTEN_NONE);
+		        if (tts != null) {
+		            tts.stop();
+		            tts.shutdown();
+		    }
 		super.onDestroy();
 	}
 
@@ -52,6 +71,7 @@ public class PhoneState extends Service {
 						//change the incoming number here 
 						//change the log as well
 						Toast.makeText(getApplicationContext(),"call from "+ incomingNumber, Toast.LENGTH_SHORT).show();
+						speakOut("Call" , "Home", incomingNumber);	
 						Toast.makeText(getApplicationContext(),"idle --> ringing = new incoming call", Toast.LENGTH_SHORT).show();
 						Log.d("state", "idle --> ringing = new incoming call");
 						// idle --> ringing = new incoming call
@@ -108,8 +128,24 @@ public class PhoneState extends Service {
 		}
 	}
 
-	public static void init(Context c) {
-		c.startService(new Intent(c, PhoneState.class));
-		Log.d("Service enabled","Service enabled: " + true);
-	}
+	 
+	 
+	    
+	    private void speakOut(String status,String name,String phonenumber) {
+	    	
+	    	
+	    	String text="nothin recieved";
+	    	if(name!=null)
+	    	{
+	    		text = status+ " from "+ name + "       Phone Number" + phonenumber;
+	    	}
+	    	else
+	    	{
+	    		text = status +" from "+ phonenumber;
+	    	}
+
+	        Toast.makeText(getApplicationContext(), text, 
+	        Toast.LENGTH_LONG).show();
+	        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+	    }
 }
