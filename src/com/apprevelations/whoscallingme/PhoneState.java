@@ -3,7 +3,10 @@ package com.apprevelations.whoscallingme;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -56,6 +59,9 @@ public class PhoneState extends Service {
 						Log.d("state", "idle --> ringing = new incoming call");
 						// idle --> ringing = new incoming call
 						//triggerSenses(Sense.CallEvent.INCOMING);
+						
+						String Name = getContactName(incomingNumber);
+						Toast.makeText(getApplicationContext(), Name, Toast.LENGTH_LONG).show();
 					}
 					break;
 
@@ -112,4 +118,35 @@ public class PhoneState extends Service {
 		c.startService(new Intent(c, PhoneState.class));
 		Log.d("Service enabled","Service enabled: " + true);
 	}
+
+	public String getContactName(String incomingNumber) {
+		// TODO Auto-generated method stub
+		String name = null;
+		String contactId = null;
+
+		// define the columns the query returns
+		String[] projection = new String[] {
+		        ContactsContract.PhoneLookup.DISPLAY_NAME,
+		        ContactsContract.PhoneLookup._ID};
+
+		// encode the phone number and build the filter URI
+		Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(incomingNumber));
+
+		// query time
+		Cursor cursor = this.getContentResolver().query(contactUri, projection, null, null, null);
+
+		if (cursor.moveToFirst()) {
+
+		    // Get values from contacts database:
+		    contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
+		    name = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+ 
+		    return name;
+		} else {
+
+		    Log.v("ffnet", "Started uploadcontactphoto: Contact Not Found @ " + incomingNumber);
+		    return incomingNumber; // contact not found
+		}
+	}
+	
 }
