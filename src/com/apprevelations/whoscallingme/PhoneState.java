@@ -40,19 +40,14 @@ public class PhoneState extends Service {
 		    	            
 		    	        } else {
 		    	        	tts.setLanguage(Locale.UK);
+		    	        	tts.setSpeechRate((float) 0.6);
 		    	        }
 		    	    } else {
 		    	        Log.e("TTS", "Initilization Failed!");
-		    	    }
-	/*	         if(status != TextToSpeech.ERROR){
+		    	    }         
+		    	  if(status != TextToSpeech.ERROR){
 		             tts.setLanguage(Locale.UK);
-		             tts.setPitch((float) 3.0);
-		             tts.setSpeechRate((float) 0.4);
-		            }	*/			
-		         if(status != TextToSpeech.ERROR){
-		             tts.setLanguage(Locale.UK);
-		             tts.setPitch((float) 3.0);
-		             tts.setSpeechRate((float) 0.4);
+		             tts.setSpeechRate((float) 0.6);
 		            }				
 		         }
 		      });
@@ -82,6 +77,9 @@ public class PhoneState extends Service {
 		@Override
 		public void onCallStateChanged(int state, String incomingNumber) {
 
+			Toast.makeText(getApplicationContext(),"call from "+ incomingNumber, Toast.LENGTH_SHORT).show();
+			String Name = getContactName(incomingNumber);
+			Toast.makeText(getApplicationContext(), Name, Toast.LENGTH_LONG).show();
 			switch (mCallState) {
 
 				case TelephonyManager.CALL_STATE_IDLE:
@@ -94,15 +92,13 @@ public class PhoneState extends Service {
 
 						//change the incoming number here 
 						//change the log as well
-						Toast.makeText(getApplicationContext(),"call from "+ incomingNumber, Toast.LENGTH_SHORT).show();
-						speakOut("Call" , "Home", incomingNumber);	
+						
+						speakOut("Call recieved from" , Name, incomingNumber);	
 						Toast.makeText(getApplicationContext(),"idle --> ringing = new incoming call", Toast.LENGTH_SHORT).show();
 						Log.d("state", "idle --> ringing = new incoming call");
 						// idle --> ringing = new incoming call
 						//triggerSenses(Sense.CallEvent.INCOMING);
 						
-						String Name = getContactName(incomingNumber);
-						Toast.makeText(getApplicationContext(), Name, Toast.LENGTH_LONG).show();
 					}
 					break;
 
@@ -143,6 +139,7 @@ public class PhoneState extends Service {
 						//change notification bar
 						//change call screen
 
+						speakOut("Missed Call of", Name, incomingNumber);
 						Toast.makeText(getApplicationContext(),"ringing --> idle = missed call", Toast.LENGTH_SHORT).show();
 						Log.d("state", "ringing --> idle = missed call");
 						// ringing --> idle = missed call
@@ -164,11 +161,11 @@ public class PhoneState extends Service {
 	    	String text="nothin recieved";
 	    	if(name!=null)
 	    	{
-	    		text = status+ " from "+ name + "       Phone Number" + phonenumber;
+	    		text = status  + name + "       Phone Number" + phonenumber;
 	    	}
 	    	else
 	    	{
-	    		text = status +" from "+ phonenumber;
+	    		text = status + phonenumber;
 	    	}
 
 	        Toast.makeText(getApplicationContext(), text, 
