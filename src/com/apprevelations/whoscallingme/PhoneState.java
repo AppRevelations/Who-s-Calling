@@ -25,11 +25,27 @@ public class PhoneState extends Service {
 			      new TextToSpeech.OnInitListener() {
 		      @Override
 		      public void onInit(int status) {
-		         if(status != TextToSpeech.ERROR){
+		    	  if (status == TextToSpeech.SUCCESS) {
+		    	        int result = tts.setLanguage(Locale.US);
+		    	        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+		    	            Log.e("TTS", "This Language is not supported");
+		    	            Intent installIntent = new Intent();
+		    	            installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+		    	            Toast.makeText(getApplicationContext(), "TTS not installed please install it", Toast.LENGTH_LONG).show();
+		    	            installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		    	            startActivity(installIntent);
+		    	            
+		    	        } else {
+		    	        	tts.setLanguage(Locale.UK);
+		    	        }
+		    	    } else {
+		    	        Log.e("TTS", "Initilization Failed!");
+		    	    }
+	/*	         if(status != TextToSpeech.ERROR){
 		             tts.setLanguage(Locale.UK);
 		             tts.setPitch((float) 3.0);
 		             tts.setSpeechRate((float) 0.4);
-		            }				
+		            }	*/			
 		         }
 		      });
 		mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
