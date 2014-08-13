@@ -4,9 +4,16 @@
     android:orientation="vertical" >
 
     <Button
-        android:id="@+id/bu"
-        android:layout_width="wrap_content"
+        android:id="@+id/bstart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Run Service" />
+    
+    
+    <Button
+        android:id="@+id/bstop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop Service" />
 
 </LinearLayout>
