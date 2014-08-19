@@ -3,7 +3,6 @@ package com.apprevelations.whoscallingme;
 import java.util.Locale;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
